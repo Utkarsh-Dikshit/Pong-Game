@@ -183,6 +183,7 @@ class Game{
             if (Is_Mouse_Over_Button(button_play) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                 button_clicked = true;
                 gamePause = false;
+                SetSoundVolume(background, 0.30);
             }
             if (Is_Mouse_Over_Button(button_music) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                 musicStop = !musicStop;
@@ -235,9 +236,9 @@ class Menu{
 
 
 void Create_Menu(){
-    Init_Button(&button_play, Rectangle{419, 63, 185.7, 63.4}, BLUE, BLACK);
-    Init_Button(&button_music, Rectangle{417, 186.4, 185.7, 63.4}, BLUE, BLACK);
-    Init_Button(&button_exit, Rectangle{419, 309.9, 185.7, 63.4}, BLUE, BLACK);
+    Init_Button(&button_play, Rectangle{419, 64, 184.5, 63.4}, BLUE, BLACK);
+    Init_Button(&button_music, Rectangle{419, 187.1, 184.5, 63.4}, BLUE, BLACK);
+    Init_Button(&button_exit, Rectangle{419, 310.9, 184.5, 63.4}, BLUE, BLACK);
     
     // Changing the color of the button when hovering
     if (Is_Mouse_Over_Button(button_play)){
@@ -322,7 +323,7 @@ int main(){
             
             game.draw();
 
-            if (gamePause){                
+            if (gamePause){             
                 Create_Menu();
                 game.checkClick();
                 menu.draw();
