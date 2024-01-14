@@ -62,7 +62,7 @@ public:
     float width = 20, height = 100;
     float position_x = screen_width - width - 7;
     float position_y = screen_height / 2 - height / 2;
-    int speed = 5.3;
+    int speed = 5.5;
 
     void draw()
     {
@@ -109,7 +109,7 @@ public:
     {
         if (multiplayer)
         {
-            speed = 5.3;
+            speed = 5.5;
         }
         else
         {
@@ -259,7 +259,7 @@ public:
             Player1_Score++;
             ball.ballReset();
             player1.getSpeed();
-            player2.speed = 5.3;
+            player2.speed = 5.5;
         }
 
         if (ball.position_x + ball.radius < 0)
@@ -272,7 +272,7 @@ public:
             Player2_Score++;
             ball.ballReset();
             player1.getSpeed();
-            player2.speed = 5.3;
+            player2.speed = 5.5;
         }
 
         if (sound_wall == true && !musicStop)
@@ -363,15 +363,8 @@ public:
                     }
                 }
             }
-
-            if (multiplayer)
-            {
-                player2.speed += 0.2;
-            }
-            else
-            {
-                player2.speed += 0.3;
-            }
+            
+            player2.speed += 0.3;
 
             if (!musicStop)
             {
@@ -413,11 +406,11 @@ public:
 
             if (multiplayer)
             {
-                player1.speed += 0.2;
+                player1.speed += 0.3;
             }
             else
             {
-                player1.speed += 0.3;
+                player1.speed += 0.4;
             }
 
             if (!musicStop)
@@ -431,7 +424,7 @@ public:
     {
         ball.ballReset();
         player1.getSpeed();
-        player2.speed = 5.3;
+        player2.speed = 5.5;
         Player1_Score = 0;
         Player2_Score = 0;
         player2.position_x = screen_width - width - 7;
