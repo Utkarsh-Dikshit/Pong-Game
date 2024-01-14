@@ -697,7 +697,11 @@ int main()
     Game game = Game();
     Menu menu = Menu();
 
-    InitWindow(screen_width, screen_height, "Pong Game");
+    InitWindow (screen_width, screen_height, "PongVerse");
+
+    Image image = LoadImage ("src/icon/Icon.png");
+    SetWindowIcon(image);
+
     SetTargetFPS(60);
 
     textureStart = LoadTexture("src/image/GameScreenBG.png");

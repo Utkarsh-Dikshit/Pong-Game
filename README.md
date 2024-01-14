@@ -1,4 +1,4 @@
-# Raylib-CPP-Pong-Game
+# Pong-Game Cpp (PongVerse)
 It works with raylib version 4.5. Tested on both Windows 10 and Windows 11.
 
 -- Utkarsh Dikshit
@@ -10,8 +10,18 @@ It works with raylib version 4.5. Tested on both Windows 10 and Windows 11.
 
 -----------------------------------------------------------------------------------------------------------------------------
 
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
 # How to use this template
 1. Double click on the main.code-workspace file. This will open the template in VS Code.
 2. From the Explorer Window of VS Code navigate to the src folder and double click on the "PongGame.cpp" file to view the code.
 3. Press F5 on the keyboard to compile and run the program.
 
+# How to play Game
+1. First compile and run the program or you can directly navigate to PongVerse (Only Game) -> PongVerse.exe
+2. Use Mouse to Select the Buttons/Options.
+3. Use Arrow Up and Down Keys to navigate "Right Paddle".
+4. Use W and S Key to navigate "Left Paddle" only in case of Two player.
+5. Use "Space" Key to Pause the game.
