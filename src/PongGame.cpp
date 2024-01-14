@@ -18,6 +18,7 @@ bool start = false, multiplayer = false;
 bool sound_wall = false, musicStop = false;
 bool button_clicked_play = false, exitPressed = false;
 bool gamePause = false, gameEnd = true;
+bool mouse_over_button = false;
 
 const char *SubMain_text;
 const char *first_button_text;
@@ -198,11 +199,13 @@ public:
     Right_Paddle player2 = Right_Paddle();
     float width = 20, height = 100;
 
-    Sound collision_paddle, gameOver, WinSound, background_outer, background_inner, collision_walls, PointEarned, PointLoose;
+    Sound buttonHover, buttonClick, collision_paddle, gameOver, WinSound, background_outer, background_inner, collision_walls, PointEarned, PointLoose;
 
     Game()
     {
         InitAudioDevice();
+        buttonHover = LoadSound("src/sounds/Button Hover.mp3");
+        buttonClick = LoadSound("src/sounds/Button Click.mp3");
         collision_paddle = LoadSound("src/sounds/ball collision sound.wav");
         PointEarned = LoadSound("src/sounds/Achievement.wav");
         PointLoose = LoadSound("src/sounds/loose point sound.mp3");
@@ -213,7 +216,9 @@ public:
         background_inner = LoadSound("src/sounds/Background music2.mp3");
     }
     ~Game()
-    {
+    {   
+        UnloadSound(buttonHover);
+        UnloadSound(buttonClick);
         UnloadSound(collision_paddle);
         UnloadSound(PointEarned);
         UnloadSound(PointLoose);
@@ -285,16 +290,28 @@ public:
     void checkClick_Main()
     {
         if (Is_Mouse_Over_Button(button_play) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
+        {   
+            if (!musicStop)
+            {
+                PlaySound(buttonClick);
+            }
             button_clicked_play = true;
         }
         if (Is_Mouse_Over_Button(button_music_main) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
+        {   
+            if (!musicStop)
+            {
+                PlaySound(buttonClick);
+            }
             musicStop = !musicStop;
             ResumeSound(background_outer);
         }
         if (Is_Mouse_Over_Button(button_exit) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
+        {   
+            if (!musicStop)
+            {
+                PlaySound(buttonClick);
+            }
             exitPressed = true;
         }
     }
@@ -302,7 +319,11 @@ public:
     void CheckClick_SubMenu()
     {
         if (Is_Mouse_Over_Button(button_singlePlayer) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
+        {   
+            if (!musicStop)
+            {
+                PlaySound(buttonClick);
+            }
             gameEnd = true;
             gamePause = false;
             multiplayer = false;
@@ -310,7 +331,11 @@ public:
             reset();
         }
         if (Is_Mouse_Over_Button(button_twoPlayer) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
+        {   
+            if (!musicStop)
+            {
+                PlaySound(buttonClick);
+            }
             gameEnd = true;
             gamePause = false;
             multiplayer = true;
@@ -318,7 +343,11 @@ public:
             reset();
         }
         if (Is_Mouse_Over_Button(button_back) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
+        {   
+            if (!musicStop)
+            {
+                PlaySound(buttonClick);
+            }
             button_clicked_play = false;
         }
     }
@@ -326,16 +355,28 @@ public:
     void CheckClick_SubMain()
     {
         if (Is_Mouse_Over_Button(button_play_sub) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
+        {   
+            if (!musicStop)
+            {
+                PlaySound(buttonClick);
+            }
             gamePause = false;
         }
         if (Is_Mouse_Over_Button(button_music_sub) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
+        {   
+            if (!musicStop)
+            {
+                PlaySound(buttonClick);
+            }
             musicStop = !musicStop;
             ResumeSound(background_outer);
         }
         if (Is_Mouse_Over_Button(button_MainMenu) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
+        {   
+            if (!musicStop)
+            {
+                PlaySound(buttonClick);
+            }
             start = false;
             button_clicked_play = false;
         }
@@ -495,20 +536,32 @@ public:
 class Menu
 {
 public:
+    Game game = Game();
+
     void Create_MAIN()
     {
         Init_Button(&button_play, Rectangle{419, 64, 184.5, 63.4}, BLUE, BLACK);
         Init_Button(&button_music_main, Rectangle{419, 187.1, 184.5, 63.4}, BLUE, BLACK);
         Init_Button(&button_exit, Rectangle{419, 310.9, 184.5, 63.4}, BLUE, BLACK);
 
+        if (!Is_Mouse_Over_Button(button_play) && !Is_Mouse_Over_Button(button_music_main) && !Is_Mouse_Over_Button(button_exit))
+        {
+            mouse_over_button = true;
+        }
+
         // Changing the color of the button when hovering
         if (Is_Mouse_Over_Button(button_play))
-        {
+        {   
+            if (!musicStop && mouse_over_button)
+            {
+                PlaySound(game.buttonHover);
+                mouse_over_button = false;
+            }
             button_play.color = TransBlue;
             button_play.text_color = BLACK;
         }
         else
-        {
+        {   
             button_play.color = BLUE;
             button_play.text_color = WHITE;
         }
@@ -527,7 +580,13 @@ public:
             }
         }
         else if (Is_Mouse_Over_Button(button_music_main))
-        {
+        {            
+            if (mouse_over_button)
+            {
+                PlaySound(game.buttonHover);
+                mouse_over_button = false;
+            }
+
             button_music_main.color = TransBlue;
             button_music_main.text_color = BLACK;
         }
@@ -538,7 +597,12 @@ public:
         }
 
         if (Is_Mouse_Over_Button(button_exit))
-        {
+        {   
+            if (!musicStop && mouse_over_button)
+            {
+                PlaySound(game.buttonHover);
+                mouse_over_button = false;
+            }
             button_exit.color = TransRed;
             button_exit.text_color = BLACK;
         }
@@ -547,6 +611,7 @@ public:
             button_exit.color = BLUE;
             button_exit.text_color = WHITE;
         }
+
     }
 
     void Create_SubMenu()
@@ -555,9 +620,19 @@ public:
         Init_Button(&button_twoPlayer, Rectangle{419, 187.1, 184.5, 63.4}, BLUE, BLACK);
         Init_Button(&button_back, Rectangle{419, 310.9, 184.5, 63.4}, BLUE, BLACK);
 
+        if (!Is_Mouse_Over_Button(button_singlePlayer) && !Is_Mouse_Over_Button(button_twoPlayer) && !Is_Mouse_Over_Button(button_back))
+        {
+            mouse_over_button = true;
+        }
+
         // Changing the color of the button when hovering
         if (Is_Mouse_Over_Button(button_singlePlayer))
-        {
+        {   
+            if (!musicStop && mouse_over_button)
+            {
+                PlaySound(game.buttonHover);
+                mouse_over_button = false;
+            }
             button_singlePlayer.color = TransBlue;
             button_singlePlayer.text_color = BLACK;
         }
@@ -568,7 +643,12 @@ public:
         }
 
         if (Is_Mouse_Over_Button(button_twoPlayer))
-        {
+        {   
+            if (!musicStop && mouse_over_button)
+            {
+                PlaySound(game.buttonHover);
+                mouse_over_button = false;
+            }
             button_twoPlayer.color = TransBlue;
             button_twoPlayer.text_color = BLACK;
         }
@@ -579,7 +659,12 @@ public:
         }
 
         if (Is_Mouse_Over_Button(button_back))
-        {
+        {   
+            if (!musicStop && mouse_over_button)
+            {
+                PlaySound(game.buttonHover);
+                mouse_over_button = false;
+            }
             button_back.color = TransRed;
             button_back.text_color = BLACK;
         }
@@ -596,9 +681,19 @@ public:
         Init_Button(&button_music_sub, Rectangle{419, 187.1 + 78.85, 184.5, 63.4}, BLUE, BLACK);
         Init_Button(&button_MainMenu, Rectangle{419, 310.9 + 78.85, 184.5, 63.4}, BLUE, BLACK);
 
+        if (!Is_Mouse_Over_Button(button_play_sub) && !Is_Mouse_Over_Button(button_music_sub) && !Is_Mouse_Over_Button(button_MainMenu))
+        {
+            mouse_over_button = true;
+        }
+
         // Changing the color of the button when hovering
         if (Is_Mouse_Over_Button(button_play_sub))
-        {
+        {   
+            if (!musicStop && mouse_over_button)
+            {
+                PlaySound(game.buttonHover);
+                mouse_over_button = false;
+            }
             button_play_sub.color = TransGreen;
             button_play_sub.text_color = BLACK;
         }
@@ -622,7 +717,13 @@ public:
             }
         }
         else if (Is_Mouse_Over_Button(button_music_sub))
-        {
+        {   
+            if (mouse_over_button)
+            {
+                PlaySound(game.buttonHover);
+                mouse_over_button = false;
+            }
+
             button_music_sub.color = TransBlue;
             button_music_sub.text_color = BLACK;
         }
@@ -633,7 +734,12 @@ public:
         }
 
         if (Is_Mouse_Over_Button(button_MainMenu))
-        {
+        {   
+            if (!musicStop && mouse_over_button)
+            {
+                PlaySound(game.buttonHover);
+                mouse_over_button = false;
+            }
             button_MainMenu.color = TransRed;
             button_MainMenu.text_color = BLACK;
         }
@@ -687,7 +793,6 @@ public:
 
 int main()
 {
-    Game game = Game();
     Menu menu = Menu();
 
     InitWindow (screen_width, screen_height, "PongVerse");
@@ -712,9 +817,9 @@ int main()
             SubMain_text = "GAME PAUSED";
         }
 
-        if (!IsSoundPlaying(game.background_outer) && !musicStop && !IsSoundPlaying(game.background_inner))
+        if (!IsSoundPlaying(menu.game.background_outer) && !musicStop && !IsSoundPlaying(menu.game.background_inner))
         {
-            PlaySound(game.background_outer);
+            PlaySound(menu.game.background_outer);
         }
 
         // For MAIN MENU, when the game starts
@@ -728,21 +833,21 @@ int main()
             {
                 menu.Create_MAIN();
                 menu.draw_main();
-                game.checkClick_Main();
+                menu.game.checkClick_Main();
 
                 // If music is stopped by the player after clicking the button, then Pause the music and change the background color of the music button
                 if (musicStop)
                 {
                     DrawRectangle(419.8, 215.1, 184, 3, button_music_main.text_color);
-                    PauseSound(game.background_outer);
+                    PauseSound(menu.game.background_outer);
                 }
             }
             else
             {
                 menu.Create_SubMenu();
                 menu.draw_submenu();
-                game.CheckClick_SubMenu();
-                game.player1.getSpeed();
+                menu.game.CheckClick_SubMenu();
+                menu.game.player1.getSpeed();
             }
         }
 
@@ -752,52 +857,52 @@ int main()
             // Screen and Picture is of the same dimensions thatswhy 'source' and 'destination' is same here and also we need full picture in our gamescreen
             DrawTexturePro(texturePlay, Rectangle{0, 0, (float)screen_width, (float)screen_height}, Rectangle{0, 0, (float)screen_width, (float)screen_height}, Vector2{0, 0}, 0, WHITE);
 
-            game.draw();
+            menu.game.draw();
 
             if (!gamePause)
             {
-                PauseSound(game.background_outer);
+                PauseSound(menu.game.background_outer);
 
-                if (!IsSoundPlaying(game.background_inner) && !musicStop)
+                if (!IsSoundPlaying(menu.game.background_inner) && !musicStop)
                 {
                     if (gameEnd)
                     {
-                        PlaySound(game.background_inner);
+                        PlaySound(menu.game.background_inner);
                         gameEnd = false;
                     }
                     else
                     {
-                        ResumeSound(game.background_inner);
+                        ResumeSound(menu.game.background_inner);
                     }
                 }
 
-                SetSoundVolume(game.background_inner, 0.2);
+                SetSoundVolume(menu.game.background_inner, 0.2);
 
                 DrawLine(screen_width / 2, 0, screen_width / 2, screen_height, WHITE);
                 DrawCircle(screen_width / 2, screen_height / 2, 120, TransWhite);
                 DrawText(TextFormat("%i", Player1_Score), screen_width / 4 - 20, 20, 60, WHITE);
                 DrawText(TextFormat("%i", Player2_Score), 3 * screen_width / 4 - 20, 20, 60, WHITE);
 
-                game.update();
-                game.CheckCollision();
-                game.GameEnd();
+                menu.game.update();
+                menu.game.CheckCollision();
+                menu.game.GameEnd();
             }
 
             if (gamePause)
             {
                 menu.Create_SUBMAIN();
                 menu.draw_submain();
-                PauseSound(game.background_inner);
+                PauseSound(menu.game.background_inner);
                 if (!musicStop)
                 {
-                    ResumeSound(game.background_outer);
+                    ResumeSound(menu.game.background_outer);
                 }
                 if (musicStop)
                 {
-                    PauseSound(game.background_outer);
+                    PauseSound(menu.game.background_outer);
                     DrawRectangle(419.8, 216.1 + 78.85, 184, 3, button_music_sub.text_color);
                 }
-                game.CheckClick_SubMain();
+                menu.game.CheckClick_SubMain();
             }
         }
 
