@@ -385,8 +385,11 @@ public:
     void CheckCollision()
     {
         // Checking for collision of ball with the paddle_player (also making some changes to remove multiple collision within same rectangle)
-        if (CheckCollisionCircleRec(Vector2{ball.position_x, ball.position_y}, ball.radius, Rectangle{player2.position_x, player2.position_y, 0, player2.height}))
-        {
+        if (CheckCollisionCircleRec(Vector2{ball.position_x, ball.position_y}, ball.radius, Rectangle{player2.position_x, player2.position_y, player2.width, player2.height}))
+        {   
+            // Limiting Case to avoid multiple collision within the paddle
+            ball.position_x = player2.position_x - ball.radius; 
+            
             ball.speed_x *= -1;
 
             if (ball.speed_x < 0)
@@ -413,8 +416,10 @@ public:
             }
         }
         // Checking for collision of ball with the paddle_cpu (also making some changes to remove multiple collision within same rectangle)
-        if (CheckCollisionCircleRec(Vector2{ball.position_x, ball.position_y}, ball.radius, Rectangle{player1.position_x + player1.width, player1.position_y, 0, player1.height}))
+        if (CheckCollisionCircleRec(Vector2{ball.position_x, ball.position_y}, ball.radius, Rectangle{player1.position_x, player1.position_y, player1.width, player1.height}))
         {
+            // Limiting Case to avoid multiple collision within the paddle
+            ball.position_x = player1.position_x + player1.width + ball.radius; 
             ball.speed_x *= -1;
 
             if (ball.speed_x > 0)
@@ -795,6 +800,8 @@ int main()
 {
     Menu menu = Menu();
 
+    bool Is_Previously_GamePaused = false;
+
     InitWindow (screen_width, screen_height, "PongVerse");
 
     Image image = LoadImage ("src/icon/Icon.png");
@@ -852,7 +859,7 @@ int main()
         }
 
         if (start)
-        {
+        {   
             ClearBackground(BLACK);
             // Screen and Picture is of the same dimensions thatswhy 'source' and 'destination' is same here and also we need full picture in our gamescreen
             DrawTexturePro(texturePlay, Rectangle{0, 0, (float)screen_width, (float)screen_height}, Rectangle{0, 0, (float)screen_width, (float)screen_height}, Vector2{0, 0}, 0, WHITE);
@@ -870,9 +877,16 @@ int main()
                         PlaySound(menu.game.background_inner);
                         gameEnd = false;
                     }
-                    else
-                    {
-                        ResumeSound(menu.game.background_inner);
+                    else {
+                        if (!Is_Previously_GamePaused)
+                        {
+                            PlaySound(menu.game.background_inner);
+                        }
+                        if (Is_Previously_GamePaused)
+                        {
+                            ResumeSound(menu.game.background_inner);
+                            Is_Previously_GamePaused = false;
+                        }
                     }
                 }
 
@@ -889,9 +903,11 @@ int main()
             }
 
             if (gamePause)
-            {
+            {   
+                Is_Previously_GamePaused = true;
                 menu.Create_SUBMAIN();
                 menu.draw_submain();
+                
                 PauseSound(menu.game.background_inner);
                 if (!musicStop)
                 {
