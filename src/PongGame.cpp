@@ -197,7 +197,6 @@ public:
     Ball ball = Ball();
     Left_Paddle player1 = Left_Paddle();
     Right_Paddle player2 = Right_Paddle();
-    float width = 20, height = 100;
 
     Sound buttonHover, buttonClick, collision_paddle, gameOver, WinSound, background_outer, background_inner, collision_walls, PointEarned, PointLoose;
 
@@ -217,6 +216,7 @@ public:
     }
     ~Game()
     {   
+        CloseAudioDevice();
         UnloadSound(buttonHover);
         UnloadSound(buttonClick);
         UnloadSound(collision_paddle);
@@ -384,7 +384,7 @@ public:
 
     void CheckCollision()
     {
-        // Checking for collision of ball with the paddle_player (also making some changes to remove multiple collision within same rectangle)
+        // Checking for collision of ball with the Right paddle
         if (CheckCollisionCircleRec(Vector2{ball.position_x, ball.position_y}, ball.radius, Rectangle{player2.position_x, player2.position_y, player2.width, player2.height}))
         {   
             // Limiting Case to avoid multiple collision within the paddle
@@ -415,11 +415,12 @@ public:
                 PlaySound(collision_paddle);
             }
         }
-        // Checking for collision of ball with the paddle_cpu (also making some changes to remove multiple collision within same rectangle)
+        // Checking for collision of ball with the Left Paddle
         if (CheckCollisionCircleRec(Vector2{ball.position_x, ball.position_y}, ball.radius, Rectangle{player1.position_x, player1.position_y, player1.width, player1.height}))
         {
             // Limiting Case to avoid multiple collision within the paddle
-            ball.position_x = player1.position_x + player1.width + ball.radius; 
+            ball.position_x = player1.position_x + player1.width + ball.radius;
+
             ball.speed_x *= -1;
 
             if (ball.speed_x > 0)
@@ -473,10 +474,10 @@ public:
         player2.speed = 5.5;
         Player1_Score = 0;
         Player2_Score = 0;
-        player2.position_x = screen_width - width - 7;
-        player2.position_y = screen_height / 2 - height / 2;
+        player2.position_x = screen_width - player2.width - 7;
+        player2.position_y = screen_height / 2 - player2.height / 2;
         player1.position_x = 7;
-        player1.position_y = screen_height / 2 - height / 2;
+        player1.position_y = screen_height / 2 - player1.height / 2;
     }
 
     void GameEnd()
@@ -545,9 +546,9 @@ public:
 
     void Create_MAIN()
     {
-        Init_Button(&button_play, Rectangle{419, 64, 184.5, 63.4}, BLUE, BLACK);
-        Init_Button(&button_music_main, Rectangle{419, 187.1, 184.5, 63.4}, BLUE, BLACK);
-        Init_Button(&button_exit, Rectangle{419, 310.9, 184.5, 63.4}, BLUE, BLACK);
+        Init_Button(&button_play, Rectangle{419, 64, 184.5, 63.4}, BLUE, WHITE);
+        Init_Button(&button_music_main, Rectangle{419, 187.1, 184.5, 63.4}, BLUE, WHITE);
+        Init_Button(&button_exit, Rectangle{419, 310.9, 184.5, 63.4}, BLUE, WHITE);
 
         if (!Is_Mouse_Over_Button(button_play) && !Is_Mouse_Over_Button(button_music_main) && !Is_Mouse_Over_Button(button_exit))
         {
@@ -621,9 +622,9 @@ public:
 
     void Create_SubMenu()
     {
-        Init_Button(&button_singlePlayer, Rectangle{419, 64, 184.5, 63.4}, BLUE, BLACK);
-        Init_Button(&button_twoPlayer, Rectangle{419, 187.1, 184.5, 63.4}, BLUE, BLACK);
-        Init_Button(&button_back, Rectangle{419, 310.9, 184.5, 63.4}, BLUE, BLACK);
+        Init_Button(&button_singlePlayer, Rectangle{419, 64, 184.5, 63.4}, BLUE, WHITE);
+        Init_Button(&button_twoPlayer, Rectangle{419, 187.1, 184.5, 63.4}, BLUE, WHITE);
+        Init_Button(&button_back, Rectangle{419, 310.9, 184.5, 63.4}, BLUE, WHITE);
 
         if (!Is_Mouse_Over_Button(button_singlePlayer) && !Is_Mouse_Over_Button(button_twoPlayer) && !Is_Mouse_Over_Button(button_back))
         {
@@ -682,9 +683,9 @@ public:
 
     void Create_SUBMAIN()
     {
-        Init_Button(&button_play_sub, Rectangle{419, 64 + 78.85, 184.5, 63.4}, BLUE, BLACK);
-        Init_Button(&button_music_sub, Rectangle{419, 187.1 + 78.85, 184.5, 63.4}, BLUE, BLACK);
-        Init_Button(&button_MainMenu, Rectangle{419, 310.9 + 78.85, 184.5, 63.4}, BLUE, BLACK);
+        Init_Button(&button_play_sub, Rectangle{419, 64 + 78.85, 184.5, 63.4}, BLUE, WHITE);
+        Init_Button(&button_music_sub, Rectangle{419, 187.1 + 78.85, 184.5, 63.4}, BLUE, WHITE);
+        Init_Button(&button_MainMenu, Rectangle{419, 310.9 + 78.85, 184.5, 63.4}, BLUE, WHITE);
 
         if (!Is_Mouse_Over_Button(button_play_sub) && !Is_Mouse_Over_Button(button_music_sub) && !Is_Mouse_Over_Button(button_MainMenu))
         {
@@ -854,7 +855,6 @@ int main()
                 menu.Create_SubMenu();
                 menu.draw_submenu();
                 menu.game.CheckClick_SubMenu();
-                menu.game.player1.getSpeed();
             }
         }
 
@@ -878,10 +878,12 @@ int main()
                         gameEnd = false;
                     }
                     else {
+                        // Restarting background_inner audio file if it is completed
                         if (!Is_Previously_GamePaused)
                         {
                             PlaySound(menu.game.background_inner);
                         }
+                        // Resuming the background_inner audio file if it is paused
                         if (Is_Previously_GamePaused)
                         {
                             ResumeSound(menu.game.background_inner);
